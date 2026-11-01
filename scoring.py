@@ -97,3 +97,19 @@ def excitement(game, league):
 def with_views(score, views):
     """Lekki bonus za popularność skrótu."""
     return round(score + 1.5 * math.log10((views or 0) + 1), 1)
+
+
+def order_key(game, league):
+    """Klucz sortowania: najpierw mecze najwyżej notowanych drużyn, potem emocje."""
+    h, a = game["home"], game["away"]
+    if league == "ncaa":
+        ranks = sorted(r for r in (h["rank"], a["rank"]) if r)
+        best = ranks[0] if ranks else 99
+        second = ranks[1] if len(ranks) > 1 else 99
+        return (best, second, -game.get("final", 0))
+    h_won = h["score"] >= a["score"]
+    pcts = []
+    for t, won in ((h, h_won), (a, not h_won)):
+        p = _pre_game_pct(t["record"], won)
+        pcts.append(0.5 if p is None else p)
+    return (-max(pcts), -min(pcts), -game.get("final", 0))

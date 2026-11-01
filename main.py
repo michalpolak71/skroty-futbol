@@ -20,7 +20,7 @@ import espn
 import notify
 from matching import norm
 from matching import assign_videos
-from scoring import excitement, with_views
+from scoring import excitement, order_key, with_views
 from youtube import QuotaError, YouTube
 
 
@@ -36,13 +36,15 @@ def playlist_title(cfg, games, last_day):
     week = Counter(g["week"] for g in games).most_common(1)[0][0]
     year = games[0]["season_year"]
     label = f"tydzień {week}" if season_type == 2 and week else "faza posezonowa"
-    return f"{cfg['name']} {year} – {label} – od najciekawszego ({last_day:%d.%m.%Y})"
+    return f"{cfg['name']} {year} – {label} ({last_day:%d.%m.%Y})"
 
 
 def describe(cfg, ranked, channels):
     lines = [
-        "Oficjalne skróty meczów ułożone automatycznie od najciekawszego "
-        "(wyrównanie, dogrywki, odrabianie strat, niespodzianki). Bez wyników – bez spoilerów.",
+        ("Oficjalne skróty meczów ułożone od drużyn najwyżej notowanych w rankingu AP Top 25, "
+         "a pozostałe od najciekawszego meczu. Bez wyników – bez spoilerów."
+         if cfg["name"] == "NCAA" else
+         "Oficjalne skróty meczów ułożone od drużyn z najlepszym bilansem. Bez wyników – bez spoilerów."),
         "",
     ]
     for i, g in enumerate(ranked, 1):
@@ -110,13 +112,14 @@ def run(league, today_us, dry_run):
             g["video"] = v
             g["final"] = with_views(g["excitement"], v.get("views"))
             ranked.append(g)
-    ranked.sort(key=lambda g: g["final"], reverse=True)
+    ranked.sort(key=lambda g: order_key(g, league))
     ranked = ranked[:cfg["max_videos"]]
 
     print(f"\nRanking ({len(ranked)} skrótów, {len(games) - len(found)} meczów bez skrótu):")
     for i, g in enumerate(ranked, 1):
-        print(f"{i:>2}. [{g['final']:>5}] {g['away']['display']} {g['away']['score']} – "
-              f"{g['home']['score']} {g['home']['display']}  ({', '.join(g['why']) or '-'})\n"
+        rk = lambda t: f"#{t['rank']} " if t.get('rank') else ""
+        print(f"{i:>2}. [{g['final']:>5}] {rk(g['away'])}{g['away']['display']} {g['away']['score']} – "
+              f"{g['home']['score']} {rk(g['home'])}{g['home']['display']}  ({', '.join(g['why']) or '-'})\n"
               f"      https://youtu.be/{g['video']['id']}  {g['video']['title']}")
     print(f"Zużyty limit YouTube API: ~{yt.units} jednostek")
 
@@ -136,7 +139,7 @@ def run(league, today_us, dry_run):
     link = f"https://www.youtube.com/playlist?list={latest}"
     print(f"\nGotowe: {link}  (limit: ~{yt.units} jednostek)")
     notify.send(f"{cfg['name']}: {len(ranked)} skrótów gotowe",
-                "Playlista od najciekawszego meczu czeka.", link)
+                "Playlista ze skrótami czeka.", link)
     return 0
 
 

@@ -28,7 +28,7 @@ LEAGUES = {
         ],
         "use_nickname": False,  # w NCAA przydomki się powtarzają (Tigers, Wildcats...)
         "max_videos": int(os.getenv("NCAA_MAX_VIDEOS", "30")),
-        "latest_title": "NCAA – najnowszy weekend (od najciekawszego)",
+        "latest_title": "NCAA – najnowszy weekend",
     },
     "nfl": {
         "name": "NFL",
@@ -37,7 +37,7 @@ LEAGUES = {
         "channels": ["@NFL"],
         "use_nickname": True,  # w NFL przydomki są unikalne (Bills, Chiefs...)
         "max_videos": int(os.getenv("NFL_MAX_VIDEOS", "20")),
-        "latest_title": "NFL – najnowsza kolejka (od najciekawszego)",
+        "latest_title": "NFL – najnowsza kolejka",
     },
 }
 
