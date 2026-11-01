@@ -58,11 +58,13 @@ class YouTube:
             raise RuntimeError("Do tworzenia playlist potrzebne jest połączenie z kontem (refresh token).")
         else:
             params["key"] = self.api_key
-        for attempt in range(3):
+        for attempt in range(6):
             r = requests.request(method, API + path, params=params, json=body, headers=headers, timeout=30)
-            if r.status_code < 500:
+            transient = r.status_code >= 500 or (r.status_code == 409 and
+                                                 ("ABORTED" in r.text or "SERVICE_UNAVAILABLE" in r.text))
+            if not transient:
                 break
-            time.sleep(2 * (attempt + 1))
+            time.sleep(3 * (attempt + 1))
         self.units += cost
         if r.status_code == 403 and "quota" in r.text.lower():
             raise QuotaError("Wyczerpany dzienny limit YouTube API.")
@@ -169,11 +171,13 @@ class YouTube:
         else:
             pid = self._call("POST", "/playlists", {"part": "snippet,status"}, body, cost=50, write=True)["id"]
             existing = []
+            time.sleep(5)  # świeża playlista potrzebuje chwili, zanim przyjmie filmy
         if [v for _, v in existing] == video_ids:
             return pid
         for item_id, _ in existing:
             self._call("DELETE", "/playlistItems", {"id": item_id}, cost=50, write=True)
         for vid in video_ids:
+            time.sleep(0.5)
             try:
                 self._call("POST", "/playlistItems", {"part": "snippet"},
                            {"snippet": {"playlistId": pid,

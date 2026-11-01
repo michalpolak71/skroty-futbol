@@ -22,8 +22,6 @@ LEAGUES = {
             "@ESPN",
             "@CBSSports",
             "@FOXSports",
-            "@BigTenNetwork",
-            "@SECNetwork",
             "@ACCDigitalNetwork",
             "@Big12Conference",
             "@NBCSports",
