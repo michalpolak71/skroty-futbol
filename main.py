@@ -41,10 +41,10 @@ def playlist_title(cfg, games, last_day):
 
 def describe(cfg, ranked, channels):
     lines = [
-        ("Oficjalne skróty meczów ułożone od drużyn najwyżej notowanych w rankingu AP Top 25, "
-         "a pozostałe od najciekawszego meczu. Bez wyników – bez spoilerów."
-         if cfg["name"] == "NCAA" else
-         "Oficjalne skróty meczów ułożone od drużyn z najlepszym bilansem. Bez wyników – bez spoilerów."),
+        "Oficjalne skróty meczów. Kolejność: najpierw wielkie sensacje (faworyt przegrał z dużo słabszym), "
+        "potem niespodzianki, potem wygrane faworytów – w każdej grupie od najwyżej notowanego faworyta "
+        + ("(ranking AP Top 25)" if cfg["name"] == "NCAA" else "(bilans w sezonie)")
+        + ". Na końcu pozostałe mecze, od najciekawszego.",
         "",
     ]
     for i, g in enumerate(ranked, 1):

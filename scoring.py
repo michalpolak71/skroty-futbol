@@ -99,17 +99,33 @@ def with_views(score, views):
     return round(score + 1.5 * math.log10((views or 0) + 1), 1)
 
 
-def order_key(game, league):
-    """Klucz sortowania: najpierw mecze najwyżej notowanych drużyn, potem emocje."""
+
+def _favorite(game, league):
+    """Zwraca (faworyt, rywal, siła_faworyta, duża_różnica) albo None, gdy nie ma faworyta."""
     h, a = game["home"], game["away"]
     if league == "ncaa":
-        ranks = sorted(r for r in (h["rank"], a["rank"]) if r)
-        best = ranks[0] if ranks else 99
-        second = ranks[1] if len(ranks) > 1 else 99
-        return (best, second, -game.get("final", 0))
+        hr, ar = h["rank"] or 99, a["rank"] or 99
+        if hr == ar:  # obie poza rankingiem
+            return None
+        fav, dog = (h, a) if hr < ar else (a, h)
+        fr, dr = min(hr, ar), max(hr, ar)
+        return fav, dog, fr, (dr == 99 or dr - fr >= 10)
     h_won = h["score"] >= a["score"]
-    pcts = []
-    for t, won in ((h, h_won), (a, not h_won)):
-        p = _pre_game_pct(t["record"], won)
-        pcts.append(0.5 if p is None else p)
-    return (-max(pcts), -min(pcts), -game.get("final", 0))
+    hp = _pre_game_pct(h["record"], h_won)
+    ap = _pre_game_pct(a["record"], not h_won)
+    if hp is None or ap is None or abs(hp - ap) < 0.05:
+        return None
+    fav, dog = (h, a) if hp > ap else (a, h)
+    return fav, dog, -max(hp, ap), abs(hp - ap) >= 0.3
+
+
+def order_key(game, league):
+    """1) faworyt przegrał z dużo słabszym, 2) faworyt przegrał, 3) faworyt wygrał,
+    4) mecze bez faworyta. W grupie: od najmocniejszego faworyta, potem emocje."""
+    f = _favorite(game, league)
+    if not f:
+        return (4, 0, -game.get("final", 0))
+    fav, dog, strength, big_gap = f
+    fav_lost = fav["score"] < dog["score"]
+    tier = (1 if big_gap else 2) if fav_lost else 3
+    return (tier, strength, -game.get("final", 0))
