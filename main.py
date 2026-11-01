@@ -129,13 +129,8 @@ def run(league, today_us, dry_run):
     ids = [g["video"]["id"] for g in ranked]
     title = playlist_title(cfg, ranked, dates[-1])
     desc = describe(cfg, ranked, channels)
-    try:
-        yt.sync_playlist(title, desc, config.PLAYLIST_PRIVACY, ids)
-        latest = yt.sync_playlist(cfg["latest_title"], desc, config.PLAYLIST_PRIVACY, ids)
-    except QuotaError as e:
-        print(f"!! {e}")
-        notify.send(f"{cfg['name']}: limit API", str(e))
-        return 1
+    yt.sync_playlist(title, desc, config.PLAYLIST_PRIVACY, ids)
+    latest = yt.sync_playlist(cfg["latest_title"], desc, config.PLAYLIST_PRIVACY, ids)
     link = f"https://www.youtube.com/playlist?list={latest}"
     print(f"\nGotowe: {link}  (limit: ~{yt.units} jednostek)")
     notify.send(f"{cfg['name']}: {len(ranked)} skrótów gotowe",
@@ -155,7 +150,13 @@ def main():
         print("Dziś nie niedziela ani poniedziałek – nic do zrobienia (użyj --league).")
         return 0
     today_us = date.fromisoformat(args.date) if args.date else datetime.now(ZoneInfo(config.NY_TZ)).date()
-    return run(league, today_us, args.dry_run)
+    try:
+        return run(league, today_us, args.dry_run)
+    except QuotaError as e:
+        # Kończymy bez błędu, żeby Railway nie uruchamiał bota w kółko
+        print(f"!! {e} Limit odnawia się o północy czasu pacyficznego (9:00 w Polsce).")
+        notify.send(f"{config.LEAGUES[league]['name']}: limit API", str(e))
+        return 0
 
 
 if __name__ == "__main__":

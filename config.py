@@ -8,7 +8,7 @@ WARSAW_TZ = "Europe/Warsaw"
 PLAYLIST_PRIVACY = os.getenv("PLAYLIST_PRIVACY", "unlisted")
 
 # Ile wyszukiwań awaryjnych (search.list kosztuje 100 jednostek limitu z 10 000 dziennie)
-MAX_FALLBACK_SEARCHES = int(os.getenv("MAX_FALLBACK_SEARCHES", "25"))
+MAX_FALLBACK_SEARCHES = int(os.getenv("MAX_FALLBACK_SEARCHES", "10"))
 
 # Oficjalne kanały, z których brane są skróty (kolejność = priorytet przy duplikatach).
 # Jeśli któryś uchwyt (@...) się nie odnajdzie, bot tylko wypisze ostrzeżenie w logach.

@@ -1,7 +1,8 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "deploy": {
-    "startCommand": "python main.py --league ncaa",
+    "startCommand": "python main.py",
+    "cronSchedule": "30 8 * * 0,1",
     "restartPolicyType": "NEVER"
   }
 }
