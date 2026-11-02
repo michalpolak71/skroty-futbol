@@ -2,8 +2,8 @@
 
 Co tydzień tworzy na Twoim kanale YouTube playlisty z **oficjalnymi** skrótami meczów, ułożone od najciekawszego:
 
-- **niedziela ok. 9:30** (latem 10:30) – NCAA (najwyższa dywizja FBS) z ostatniego tygodnia
-- **poniedziałek ok. 9:30** (latem 10:30) – NFL z ostatniego tygodnia (Monday Night z poprzedniego tygodnia + Thursday Night + niedziela)
+- **niedziela ok. 9:05** (latem 10:05) – NCAA (najwyższa dywizja FBS) z ostatniego tygodnia
+- **poniedziałek ok. 9:05** (latem 10:05) – NFL z ostatniego tygodnia (Monday Night z poprzedniego tygodnia + Thursday Night + niedziela)
 
 Każde uruchomienie aktualizuje dwie playlisty:
 1. **stałą** – „NCAA – najnowszy weekend…” / „NFL – najnowsza kolejka…” – zawsze ten sam link, zapisz go w zakładkach albo na ekranie telefonu,
@@ -52,7 +52,7 @@ Jeśli w logu zobaczysz `! nie znaleziono kanału @...` – ten kanał po prostu
 1. Wrzuć folder do nowego, **prywatnego** repo na GitHubie (bez `client_secret.json`).
 2. Railway → **New Project → Deploy from GitHub repo**.
 3. **Variables**: `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REFRESH_TOKEN`.
-4. Harmonogram jest już w `railway.json` (`30 8 * * 0,1` = niedziela i poniedziałek 8:30 UTC, czyli 9:30 zimą / 10:30 latem, zaraz po odnowieniu limitu YouTube). Sprawdź w **Settings → Cron Schedule**, że się pojawił.
+4. Harmonogram jest już w `railway.json` (`5 8 * * 0,1` = niedziela i poniedziałek 8:05 UTC, czyli 9:05 zimą / 10:05 latem, zaraz po odnowieniu limitu YouTube). Sprawdź w **Settings → Cron Schedule**, że się pojawił.
 5. Pierwszy test od razu: w Railway ustaw tymczasowo Start Command `python main.py --league nfl`, uruchom deploy, po udanym przebiegu przywróć `python main.py`.
 
 ## Zmienne opcjonalne
