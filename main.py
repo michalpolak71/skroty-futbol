@@ -171,6 +171,10 @@ def safe_run(league, today_us, dry_run, only_latest=False):
         print(f"!! {e} Limit odnawia się o północy czasu pacyficznego (9:00 w Polsce).")
         notify.send(f"{config.LEAGUES[league]['name']}: limit API", str(e))
         return 0
+    except RuntimeError as e:
+        print(f"!! Błąd w przebiegu {league}: {e}")
+        notify.send(f"{config.LEAGUES[league]['name']}: błąd", str(e)[:200])
+        return 0
 
 
 if __name__ == "__main__":

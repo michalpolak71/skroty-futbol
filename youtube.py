@@ -67,7 +67,15 @@ class YouTube:
             time.sleep(3 * (attempt + 1))
         self.units += cost
         if r.status_code == 403 and "quota" in r.text.lower():
-            raise QuotaError("Wyczerpany dzienny limit YouTube API.")
+            reason = ""
+            try:
+                reason = r.json()["error"]["errors"][0].get("reason", "")
+            except Exception:
+                pass
+            print(f"  ! 403 przy {method} {path}: {reason} | {r.text[:300]}")
+            if reason in ("quotaExceeded", "dailyLimitExceeded"):
+                raise QuotaError("Wyczerpany dzienny limit YouTube API.")
+            raise RuntimeError(f"YouTube API {method} {path}: 403 {reason}")
         if r.status_code >= 400:
             raise RuntimeError(f"YouTube API {method} {path}: {r.status_code} {r.text[:300]}")
         return r.json() if r.text else {}
