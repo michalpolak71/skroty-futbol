@@ -63,6 +63,7 @@ Jeśli w logu zobaczysz `! nie znaleziono kanału @...` – ten kanał po prostu
 | `NCAA_MAX_VIDEOS` | `30` | ile skrótów NCAA w playliście |
 | `NFL_MAX_VIDEOS` | `20` | ile skrótów NFL |
 | `MAX_FALLBACK_SEARCHES` | `10` | ile wyszukiwań awaryjnych (każde zużywa 100 z 10 000 jednostek dziennie) |
+| `VIEWER_COUNTRY` | `PL` | pomija filmy zablokowane w tym kraju (np. skróty NBC dostępne tylko w USA) |
 | `NTFY_TOPIC` | – | powiadomienie push na telefon: zainstaluj aplikację **ntfy**, zasubskrybuj wymyśloną, trudną do zgadnięcia nazwę (np. `skroty-michal-8k3x`) i wpisz ją tutaj |
 
 ## Limit YouTube API

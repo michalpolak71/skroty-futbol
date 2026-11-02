@@ -122,7 +122,13 @@ class YouTube:
                 v["duration"] = _duration(it["contentDetails"].get("duration"))
                 v["views"] = int((it.get("statistics") or {}).get("viewCount", 0))
                 v["live"] = it["snippet"].get("liveBroadcastContent", "none") != "none"
-        return [v for v in videos if "duration" in v]
+                rr = it["contentDetails"].get("regionRestriction") or {}
+                cc = os.getenv("VIEWER_COUNTRY", "PL")
+                v["blocked"] = (cc in rr.get("blocked", [])) or ("allowed" in rr and cc not in rr["allowed"])
+        dropped = [v for v in videos if v.get("blocked")]
+        for v in dropped:
+            print(f"  ~ pomijam (zablokowany w {os.getenv('VIEWER_COUNTRY', 'PL')}): {v['title'][:80]}")
+        return [v for v in videos if "duration" in v and not v.get("blocked")]
 
     def search(self, query, since_iso):
         data = self._call("GET", "/search", {"part": "snippet", "type": "video", "q": query,
