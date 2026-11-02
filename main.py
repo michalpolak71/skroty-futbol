@@ -60,7 +60,7 @@ def describe(cfg, ranked, channels):
     return "\n".join(lines)
 
 
-def run(league, today_us, dry_run):
+def run(league, today_us, dry_run, only_latest=False):
     cfg = config.LEAGUES[league]
     dates = [today_us - timedelta(days=i) for i in range(7, 0, -1)]
     since = datetime.combine(dates[0], time(0), ZoneInfo(config.NY_TZ)).astimezone(timezone.utc)
@@ -129,7 +129,8 @@ def run(league, today_us, dry_run):
     ids = [g["video"]["id"] for g in ranked]
     title = playlist_title(cfg, ranked, dates[-1])
     desc = describe(cfg, ranked, channels)
-    yt.sync_playlist(title, desc, config.PLAYLIST_PRIVACY, ids)
+    if not only_latest:
+        yt.sync_playlist(title, desc, config.PLAYLIST_PRIVACY, ids)
     latest = yt.sync_playlist(cfg["latest_title"], desc, config.PLAYLIST_PRIVACY, ids)
     link = f"https://www.youtube.com/playlist?list={latest}"
     print(f"\nGotowe: {link}  (limit: ~{yt.units} jednostek)")
@@ -150,8 +151,21 @@ def main():
         print("Dziś nie niedziela ani poniedziałek – nic do zrobienia (użyj --league).")
         return 0
     today_us = date.fromisoformat(args.date) if args.date else datetime.now(ZoneInfo(config.NY_TZ)).date()
+    safe_run(league, today_us, args.dry_run)
+
+    # Jednorazowe dodatkowe przebiegi (same wygasają po dacie)
+    if args.league == "auto" and not args.date:
+        today_pl = datetime.now(ZoneInfo(config.WARSAW_TZ)).date().isoformat()
+        for pl_day, lg, us_day in config.EXTRA_RUNS:
+            if pl_day == today_pl:
+                print(f"\n== Dodatkowy przebieg: {lg} do {us_day}")
+                safe_run(lg, date.fromisoformat(us_day), args.dry_run, only_latest=True)
+    return 0
+
+
+def safe_run(league, today_us, dry_run, only_latest=False):
     try:
-        return run(league, today_us, args.dry_run)
+        return run(league, today_us, dry_run, only_latest)
     except QuotaError as e:
         # Kończymy bez błędu, żeby Railway nie uruchamiał bota w kółko
         print(f"!! {e} Limit odnawia się o północy czasu pacyficznego (9:00 w Polsce).")

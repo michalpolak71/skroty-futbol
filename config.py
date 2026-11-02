@@ -47,3 +47,10 @@ TRUSTED_CHANNEL_TITLES = {
     "fox sports", "fox college football", "nfl", "big ten network", "sec network",
     "acc digital network", "big 12 conference", "nbc sports", "the cw sports",
 }
+
+# Jednorazowe dodatkowe przebiegi: (data w Polsce, liga, "dzień uruchomienia" w USA).
+# 2.11.2026: przebudowa playlisty NCAA za 25–31.10 według nowej kolejności
+# (sensacje → niespodzianki → wygrane faworytów). Aktualizuje tylko stałą playlistę.
+EXTRA_RUNS = [
+    ("2026-11-02", "ncaa", "2026-11-01"),
+]
